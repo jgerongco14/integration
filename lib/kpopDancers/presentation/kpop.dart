@@ -113,6 +113,8 @@ class _KPOPDancersPageState extends State<KPOPDancersPage> {
                                                     kpopDancerController
                                                         .fetchKpopDancers();
                                               });
+                                              print(
+                                                  'Deleting Kpop dancer with id: ${kpopDancer['id']}');
                                             }
                                           },
                                           itemBuilder: (BuildContext context) {
@@ -152,8 +154,12 @@ class _KPOPDancersPageState extends State<KPOPDancersPage> {
                                               kpopDancer['photo'],
                                               fit: BoxFit.cover,
                                             )
-                                          : Icon(Icons.person,
-                                              size: heightSize * 0.5),
+                                          : CircleAvatar(
+                                              backgroundColor: Colors.grey,
+                                              child: Icon(Icons.person,
+                                                  color: Colors.white,
+                                                  size: heightSize * 0.3),
+                                            ),
                                     ),
                                   ),
                                   Padding(
@@ -191,11 +197,11 @@ class _KPOPDancersPageState extends State<KPOPDancersPage> {
         ));
   }
 
-  void performSearch(stageName) {
-    String stageName = searchController.text.trim();
-    if (stageName.isNotEmpty) {
+  void performSearch(name) {
+    String name = searchController.text.trim();
+    if (name.isNotEmpty) {
       setState(() {
-        kpopDancers = kpopDancerController.searchKpopDancers(stageName);
+        kpopDancers = kpopDancerController.searchKpopDancers(name);
       });
     }
   }

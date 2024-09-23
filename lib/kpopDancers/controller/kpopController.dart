@@ -10,28 +10,46 @@ class KpopDancerController {
     final response = await http.get(Uri.parse('$baseUrl/kpop_dancers'));
 
     if (response.statusCode == 200) {
-      List<Map<String, dynamic>> data =
-          (json.decode(response.body) as List).cast<Map<String, dynamic>>();
-      return data;
+      // Print raw response to check its structure
+      print('Response body: ${response.body}');
+
+      // Optionally, clean up response if it contains invalid JSON (e.g., comments)
+      String cleanedBody = response.body.replaceAll(RegExp(r'/\*.*?\*/'), '');
+
+      try {
+        List<Map<String, dynamic>> data =
+            (json.decode(cleanedBody) as List).cast<Map<String, dynamic>>();
+        return data;
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw FormatException('Invalid JSON format');
+      }
     } else {
       throw Exception('Failed to load data from PHP API');
     }
   }
 
-  Future<List<Map<String, dynamic>>?> searchKpopDancers(
-      String stageName) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/kpop_dancers?stage_name=$stageName'));
+  Future<List<Map<String, dynamic>>?> searchKpopDancers(String name) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/kpop_dancers?name=$name'));
 
     if (response.statusCode == 200) {
-      List<Map<String, dynamic>> data =
-          (json.decode(response.body) as List).cast<Map<String, dynamic>>();
-      return data;
+      // Clean the response by removing comments (/* */)
+      String cleanedBody = response.body.replaceAll(RegExp(r'/\*.*?\*/'), '');
+
+      try {
+        // Decode the cleaned response
+        List<Map<String, dynamic>> data =
+            (json.decode(cleanedBody) as List).cast<Map<String, dynamic>>();
+        return data;
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw FormatException('Failed to parse JSON response');
+      }
     } else {
       throw Exception('Failed to search Kpop dancers from PHP API');
     }
   }
-
 
   Future<Map<String, dynamic>?> insertKpopDancer(
       Map<String, dynamic> data) async {
@@ -44,7 +62,14 @@ class KpopDancerController {
     );
 
     if (response.statusCode == 201) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      String cleanedBody = response.body.replaceAll(RegExp(r'/\*.*?\*/'), '');
+      try {
+        // Decode the cleaned response
+        return json.decode(cleanedBody) as Map<String, dynamic>;
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw FormatException('Failed to parse JSON response');
+      }
     } else {
       throw Exception('Failed to insert Kpop dancer via PHP API');
     }
@@ -87,7 +112,14 @@ class KpopDancerController {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      String cleanedBody = response.body.replaceAll(RegExp(r'/\*.*?\*/'), '');
+      try {
+        // Decode the cleaned response
+        return json.decode(cleanedBody) as Map<String, dynamic>;
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw FormatException('Failed to parse JSON response');
+      }
     } else {
       throw Exception('Failed to update Kpop dancer via PHP API');
     }
@@ -97,7 +129,16 @@ class KpopDancerController {
     final response = await http.get(Uri.parse('$baseUrl/kpop_dancers?id=$id'));
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      // Clean the response by removing comments (/* */)
+      String cleanedBody = response.body.replaceAll(RegExp(r'/\*.*?\*/'), '');
+
+      try {
+        // Decode the cleaned response
+        return json.decode(cleanedBody) as Map<String, dynamic>;
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw FormatException('Failed to parse JSON response');
+      }
     } else {
       throw Exception('Failed to fetch Kpop dancer by ID via PHP API');
     }
@@ -107,7 +148,13 @@ class KpopDancerController {
     final response =
         await http.delete(Uri.parse('$baseUrl/kpop_dancers?id=$id'));
 
-    if (response.statusCode != 204) {
+    // Debugging
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('Kpop dancer deleted successfully');
+    } else {
       throw Exception('Failed to delete Kpop dancer via PHP API');
     }
   }
